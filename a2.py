@@ -149,3 +149,4 @@ f.close()
 
 
 print("total connections: ", len(connections))
+print(connections)
