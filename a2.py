@@ -153,6 +153,6 @@ print("total connections: ", len(connections))
 reset_count = 0
 for key in connections.keys():
     if connections[key]["rst"] == True:
-        reset_count++
+        reset_count+=1
 
 print(reset_count)
