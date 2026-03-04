@@ -171,7 +171,7 @@ for conn_key, conn in connections.items():
 
     first_syn = conn["first_flags"] & 0x02
     if not first_syn:
-        open_count+=1
+        established_before_capture += 1
 
     last_fin = conn["last_flags"] & 0x01
     if not last_fin:
