@@ -150,13 +150,10 @@ f.close()
 
 print("total connections: ", len(connections))
 
-# reset_count = 0
-# for key in connections.keys():
-#     if connections[key]["rst"] == True:
-#         reset_count+=1
+reset_count = 0
+for key in connections.keys():
+    if connections[key]["rst"] == True:
+        reset_count+=1
 
-# print(reset_count)
+print(reset_count)
 
-
-for connection in connections:
-    print(connection)
