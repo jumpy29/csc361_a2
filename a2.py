@@ -149,4 +149,10 @@ f.close()
 
 
 print("total connections: ", len(connections))
-print(connections)
+
+reset_count = 0
+for key in connections.keys():
+    if connections[key]["rst"] == True:
+        reset_count++
+
+print(reset_count)
