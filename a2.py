@@ -43,6 +43,10 @@ conn_data = {
     "bytes_dst_src": 0
 }
 
+
+connections = {}
+
+
 while True:
     packet_count += 1
 
@@ -69,41 +73,64 @@ while True:
     ip_header_len = (packet_data[14] & 0x0F) * 4
     tcp_start = 14 + ip_header_len
 
+
+    src_port = struct.unpack(">H", packet_data[tcp_start:tcp_start+2])[0]
+    dst_port = struct.unpack(">H", packet_data[tcp_start+2:tcp_start+4])[0]
+
+    if (src_ip, dst_ip, src_port, dst_port) in connections.keys():
+        cur_connection = (src_ip, dst_ip, src_port, dst_port)
+    elif (dst_ip, src_ip, dst_port, src_port) in connections.keys():
+        cur_connection = (dst_ip, src_ip, dst_port, src_port)
+    else: 
+        cur_connection = (src_ip, dst_ip, src_port, dst_port) # create new key
+
+    # create new entry in connections
+    if cur_connection not in connections.keys():
+        connections[cur_connection] = {
+                                       "start_time": ts_sec+ts_usec/1_000_000,
+                                       "packets_src_dst": 0,
+                                       "packets_dst_src": 0,
+                                       "total_packets": 0,
+                                       "bytes_src_dst": 0,
+                                       "bytes_dst_src": 0,
+                                       "total_bytes": 0, 
+                                       "rst": False,
+                                       "syn": 0,
+                                       "fin": 0,
+                                       "sender_window_size": 0,
+                                       "receiver_window_size": 0
+                                       }
+        
+    connection = connections[cur_connection]
+    connection["total_packets"] += 1
+
+    src_0, dst_0, sport_0, dport_0 = cur_connection
+
+    if (src_0, dst_0, sport_0, dport_0) == (src_ip, dst_ip, src_port, dst_port):
+        direction = "src_dst"
+    else: 
+        direction = "dst_src"
+
+    
+    if direction == "src_dst":
+        connection["packets_src_dst"] +=1
+    else: 
+        connection["packets_dst_src"] +=1
+        
+
     flags = packet_data[tcp_start + 13]
     fin = flags & 0x01
     syn = flags & 0x02
     rst = flags & 0x04
 
-    src_port = struct.unpack(">H", packet_data[tcp_start:tcp_start+2])[0]
-    dst_port = struct.unpack(">H", packet_data[tcp_start+2:tcp_start+4])[0]
-
-    if first_connection is None:
-        first_connection = (src_ip, src_port, dst_ip, dst_port)
-        conn_data["start_time"] = ts_sec + ts_usec/1_000_000
-
-    src0, sport0, dst0, dport0 = first_connection
-
-    if (src_ip, src_port, dst_ip, dst_port) == first_connection:
-        direction = "src_dst"
-    elif (src_ip, src_port, dst_ip, dst_port) == (dst0, dport0, src0, sport0):
-        direction = "dst_src"
-    else:
-        continue
-
-    if direction == "src_dst":
-        conn_data["packets_src_dst"] += 1
-    else:
-        conn_data["packets_dst_src"] += 1
-
     if syn:
-        conn_data["syn"] += 1
+        connection["syn"] += 1
     if fin:
-        conn_data["fin"] += 1
+        connection["fin"] += 1
     if rst:
-        print(packet_count)
-        conn_data["rst"] = True
+        connection["rst"] = True
 
-    conn_data["end_time"] = ts_sec + ts_usec/1_000_000
+    connection["end_time"] = ts_sec + ts_usec/1_000_000
 
     tcp_header_len = ((packet_data[tcp_start + 12]>>4)& 0xF) * 4
 
@@ -112,33 +139,13 @@ while True:
 
     if payload_size > 0:
         if direction=="src_dst":
-            conn_data["bytes_src_dst"] += payload_size
+            connection["bytes_src_dst"] += payload_size
         else:
-            conn_data["bytes_dst_src"] += payload_size    
+            connection["bytes_dst_src"] += payload_size    
+
+    connection["total_bytes"] += payload_size
     
-
-
-total_packets = conn_data["packets_src_dst"]+conn_data["packets_dst_src"]
-total_bytes = conn_data["bytes_src_dst"] + conn_data["bytes_dst_src"]
-
-if conn_data["rst"]:
-    status = "R"
-else:
-    status = "S"+str(conn_data["syn"])+"F"+str(conn_data["fin"])
-
-print("\nConnection summary")
-print("---------------")
-print("src address:", src0)
-print("dest address:", dst0)
-print("src port:", sport0)
-print("dest port:", dport0)
-print("status:", status)
-
-if status=="COMPLETE":
-    duration = conn_data["end_time"] - conn_data["start_time"]
-
-    print("start time:", conn_data["start_time"])
-    print("end time:", conn_data["end_time"])
-    print("duration:", duration)
-
 f.close()
+
+
+print("total connections: ", len(connections))
