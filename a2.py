@@ -84,6 +84,12 @@ while True:
     else: 
         cur_connection = (src_ip, dst_ip, src_port, dst_port) # create new key
 
+    flags = packet_data[tcp_start + 13]
+    fin = flags & 0x01
+    syn = flags & 0x02
+    rst = flags & 0x04
+
+
     # create new entry in connections
     if cur_connection not in connections.keys():
         connections[cur_connection] = {
@@ -98,7 +104,8 @@ while True:
                                        "syn": 0,
                                        "fin": 0,
                                        "sender_window_size": 0,
-                                       "receiver_window_size": 0
+                                       "receiver_window_size": 0,
+                                       "last_flags": 0
                                        }
         
     connection = connections[cur_connection]
@@ -118,10 +125,6 @@ while True:
         connection["packets_dst_src"] +=1
         
 
-    flags = packet_data[tcp_start + 13]
-    fin = flags & 0x01
-    syn = flags & 0x02
-    rst = flags & 0x04
 
     if syn:
         connection["syn"] += 1
@@ -130,6 +133,8 @@ while True:
     if rst:
         connection["rst"] = True
 
+    connection["last_flags"] = flags
+    
     connection["end_time"] = ts_sec + ts_usec/1_000_000
 
     tcp_header_len = ((packet_data[tcp_start + 12]>>4)& 0xF) * 4
@@ -150,10 +155,27 @@ f.close()
 
 print("total connections: ", len(connections))
 
+
 reset_count = 0
-for key in connections.keys():
-    if connections[key]["rst"] == True:
+complete_count = 0
+open_count = 0
+established_before_capture = 0
+
+for conn_key, conn in connections.items():
+    if conn["rst"]:
         reset_count+=1
+    
+    if conn["syn"] >=1 and conn["fin"] >=1:
+        complete_count+=1
 
-print(reset_count)
+    if conn["syn"] == 0:
+        established_before_capture += 1
 
+    last_fin = conn["last_flags"] & 0x01
+    if not last_fin:
+        open_count += 1
+
+print("Reset connections:", reset_count)
+print("Complete connections:", complete_count)
+print("Open connections:", open_count)
+print("Established before capture:", established_before_capture)
