@@ -105,7 +105,8 @@ while True:
                                        "fin": 0,
                                        "sender_window_size": 0,
                                        "receiver_window_size": 0,
-                                       "last_flags": 0
+                                       "last_flags": 0,
+                                       "first_flags": flags
                                        }
         
     connection = connections[cur_connection]
@@ -168,8 +169,9 @@ for conn_key, conn in connections.items():
     if conn["syn"] >=1 and conn["fin"] >=1:
         complete_count+=1
 
-    if conn["syn"] == 0:
-        established_before_capture += 1
+    first_syn = conn["first_flags"] & 0x02
+    if not first_syn:
+        open_count+=1
 
     last_fin = conn["last_flags"] & 0x01
     if not last_fin:
