@@ -4,14 +4,13 @@ def read_global_header(f):
     global_header = f.read(24)
 
     magic_number = global_header[:4].hex()
-    print("magic number:", magic_number)
 
     if magic_number == "d4c3b2a1":
         endian = "<"   # little endian
-        print("Little endian")
+
     elif magic_number == "a1b2c3d4":
         endian = ">"   # big endian
-        print("Big endian")
+
     else:
         raise ValueError("Unknown file format")
 
