@@ -170,6 +170,7 @@ def print_connection_details(connections, complete_connections):
     print("Connections' details:\n")
 
     for i, (conn_key, conn) in enumerate(connections.items(), 1):
+        print("++++++++++++++++++++++++++++")
         src_ip, dst_ip, src_port, dst_port = conn_key
 
         if conn["rst"]:
@@ -210,7 +211,7 @@ def print_connection_details(connections, complete_connections):
             print("Total number of data bytes:", total_bytes)
 
         print("END")
-        print("++++++++++++++++++++++++++++")
+        print("___________________________________________________________")
 
 def print_connection_counts(complete_count, reset_count, open_count, established_before_capture):
     print("\nC) General\n")
@@ -220,7 +221,7 @@ def print_connection_counts(complete_count, reset_count, open_count, established
     print("The number of TCP connections established before the capture started:", established_before_capture)
 
     print("_______________________________________________________________")
-    
+
     
 
 def main():
