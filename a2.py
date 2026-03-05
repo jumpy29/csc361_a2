@@ -169,7 +169,8 @@ def print_connection_details(connections, complete_connections):
     print("\nB)Connections' details:\n")
 
     for i, (conn_key, conn) in enumerate(connections.items(), 1):
-        print("++++++++++++++++++++++++++++")
+        if (i!=1):
+            print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
         src_ip, dst_ip, src_port, dst_port = conn_key
 
         if conn["rst"]:
