@@ -166,7 +166,7 @@ def analyze_connections(connections):
 
 
 def print_connection_details(connections, complete_connections):
-    print("Connections' details:\n")
+    print("\nB)Connections' details:\n")
 
     for i, (conn_key, conn) in enumerate(connections.items(), 1):
         print("++++++++++++++++++++++++++++")
@@ -222,7 +222,6 @@ def print_connection_counts(complete_count, reset_count, open_count, established
 
 def print_total_connections(num_conns):
     print("A) Total number of connections:", num_conns)
-    print()
     print("________________________________________________________________")
 
 def main():
