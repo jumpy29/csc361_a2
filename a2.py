@@ -163,37 +163,52 @@ def analyze_connections(connections):
     return complete_connections, complete_count, reset_count, open_count, established_before_capture
 
 
-def analyse_complete_connections(connections, complete_connections):
-    for i, conn_key in enumerate(complete_connections, 1):
-        conn = connections[conn_key]
+def print_connection_details(connections, complete_connections):
+    print("Connections' details:")
 
-        start = conn["start_time"]
-        end = conn["end_time"]
-        duration = end - start
+    for i, (conn_key, conn) in enumerate(connections.items(), 1):
+        src_ip, dst_ip, src_port, dst_port = conn_key
 
-        packets_src_dst = conn["packets_src_dst"]
-        packets_dst_src = conn["packets_dst_src"]
-        total_packets = packets_dst_src+packets_src_dst
+        if conn["rst"]:
+            status = "R"
+        else:
+            status = "S" + str(conn['syn']) + "F" + str(conn["fin"])
 
-        bytes_src_dst = conn["bytes_src_dst"]
-        bytes_dst_src = conn["bytes_dst_src"]
-        total_bytes = bytes_src_dst + bytes_dst_src
+        print(f"\nConnection {i}:")
+        print("Source Address:", src_ip)
+        print("Destination Address:", dst_ip)
+        print("Source Port:", src_port)
+        print("Destination Port:", dst_port)
+        print("Status:", status)
 
-        print(f"\nConnection {i}: {conn_key}")
+        if conn_key in complete_connections:
+            start = conn["start_time"]
+            end = conn["end_time"]
+            duration = end-start
 
-        print("Start Time:", start)
-        print("End Time:", end)
-        print("Duration:", duration)
+            packets_src_dst = conn["packets_src_dst"]
+            packets_dst_src = conn["packets_dst_src"]
+            total_packets = packets_src_dst + packets_dst_src
 
-        print("Packets src -> dst:", packets_src_dst)
-        print("Packets dst -> src:", packets_dst_src)
-        print("Total Packets:", total_packets)
+            bytes_src_dst = conn["bytes_src_dst"]
+            bytes_dst_src = conn["bytes_dst_src"]
+            total_bytes = bytes_src_dst + bytes_dst_src
 
-        print("Bytes src -> dst:", bytes_src_dst)
-        print("Bytes dst -> src:", bytes_dst_src)
-        print("Total Bytes:", total_bytes)
+            print("Start Time:", start)
+            print("End Time:", end)
+            print("Duration:", duration)
 
-        
+            print("Number of packets sent from Source to Destination:", packets_src_dst)
+            print("Number of packets sent from Destination to Source:", packets_dst_src)
+            print("Total number of packets:", total_packets)
+
+            print("Number of data bytes from Source to Destination:", bytes_src_dst)
+            print("Number of data bytes from Destination to Source:", bytes_dst_src)
+            print("Total number of data bytes:", total_bytes)
+
+        print("END")
+        print("++++++++++++++++++++++++++++")
+
 
 
 
@@ -213,6 +228,7 @@ def main():
 
     complete_connections, complete_count, reset_count, open_count, established_before_capture = analyze_connections(connections)
 
-    analyse_complete_connections(connections, complete_connections)
+    print_connection_details(connections, complete_connections)
+    
 
 main()
