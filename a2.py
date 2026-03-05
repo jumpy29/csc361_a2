@@ -86,7 +86,7 @@ def process_packets(f, endian, connections):
 
         if cur_connection not in connections.keys():
             connections[cur_connection] = {
-                "start_time": current_time,
+                "start_time": relative_time,
                 "packets_src_dst": 0,
                 "packets_dst_src": 0,
                 "bytes_src_dst": 0,
