@@ -164,7 +164,7 @@ def analyze_connections(connections):
 
 
 def print_connection_details(connections, complete_connections):
-    print("Connections' details:")
+    print("Connections' details:\n")
 
     for i, (conn_key, conn) in enumerate(connections.items(), 1):
         src_ip, dst_ip, src_port, dst_port = conn_key
@@ -174,7 +174,7 @@ def print_connection_details(connections, complete_connections):
         else:
             status = "S" + str(conn['syn']) + "F" + str(conn["fin"])
 
-        print(f"\nConnection {i}:")
+        print(f"Connection {i}:")
         print("Source Address:", src_ip)
         print("Destination Address:", dst_ip)
         print("Source Port:", src_port)
