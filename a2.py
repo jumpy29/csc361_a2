@@ -219,10 +219,12 @@ def print_connection_counts(complete_count, reset_count, open_count, established
     print("The number of reset TCP connections:", reset_count)
     print("The number of TCP connections that were still open when the trace capture ended:", open_count)
     print("The number of TCP connections established before the capture started:", established_before_capture)
-
     print("_______________________________________________________________")
 
-    
+def print_total_connections(num_conns):
+    print("A) Total number of connections:", num_conns)
+    print()
+    print("________________________________________________________________")
 
 def main():
 
@@ -238,6 +240,8 @@ def main():
 
     complete_connections, complete_count, reset_count, open_count, established_before_capture = analyze_connections(connections)
 
+    
+    print_total_connections(len(connections))
     print_connection_details(connections, complete_connections)
     print_connection_counts(complete_count, reset_count, open_count, established_before_capture)
     
