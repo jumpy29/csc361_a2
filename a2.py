@@ -211,7 +211,7 @@ def print_connection_details(connections, complete_connections):
             print("Total number of data bytes:", total_bytes)
 
         print("END")
-        print("___________________________________________________________")
+    print("___________________________________________________________")
 
 def print_connection_counts(complete_count, reset_count, open_count, established_before_capture):
     print("\nC) General\n")
