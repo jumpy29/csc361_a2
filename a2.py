@@ -202,9 +202,9 @@ def print_connection_details(connections, complete_connections):
             bytes_dst_src = conn["bytes_dst_src"]
             total_bytes = bytes_src_dst + bytes_dst_src
 
-            print("Start Time:", start)
-            print("End Time:", end)
-            print("Duration:", duration)
+            print("Start Time:", start, "seconds")
+            print("End Time:", end, "seconds")
+            print("Duration:", duration, "seconds")
 
             print("Number of packets sent from Source to Destination:", packets_src_dst)
             print("Number of packets sent from Destination to Source:", packets_dst_src)
