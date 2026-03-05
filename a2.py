@@ -89,7 +89,6 @@ while True:
     syn = flags & 0x02
     rst = flags & 0x04
 
-
     # create new entry in connections
     if cur_connection not in connections.keys():
         connections[cur_connection] = {
@@ -162,12 +161,15 @@ complete_count = 0
 open_count = 0
 established_before_capture = 0
 
+complete_connections = []
+
 for conn_key, conn in connections.items():
     if conn["rst"]:
         reset_count+=1
     
     if conn["syn"] >=1 and conn["fin"] >=1:
         complete_count+=1
+        complete_connections.append(conn_key)
 
     first_syn = conn["first_flags"] & 0x02
     if not first_syn:
@@ -181,3 +183,7 @@ print("Reset connections:", reset_count)
 print("Complete connections:", complete_count)
 print("Open connections:", open_count)
 print("Established before capture:", established_before_capture)
+
+
+print("complete connections: ")
+print(complete_connections)
