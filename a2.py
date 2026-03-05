@@ -31,7 +31,7 @@ def read_global_header(f):
 
 
 def process_packets(f, endian, connections):
-
+    first_packet_time = None
     packet_count = 0
 
     while True:
@@ -43,6 +43,14 @@ def process_packets(f, endian, connections):
             break
 
         ts_sec, ts_usec, incl_len, orig_len = struct.unpack(endian+"IIII", packet_header_bytes)
+
+
+        current_time = ts_sec + ts_usec / 1_000_000
+
+        if first_packet_time is None:
+            first_packet_time = current_time
+
+        relative_time = current_time - first_packet_time
 
         packet_data = f.read(incl_len)
 
@@ -78,7 +86,7 @@ def process_packets(f, endian, connections):
 
         if cur_connection not in connections.keys():
             connections[cur_connection] = {
-                "start_time": ts_sec+ts_usec/1_000_000,
+                "start_time": current_time,
                 "packets_src_dst": 0,
                 "packets_dst_src": 0,
                 "bytes_src_dst": 0,
@@ -115,7 +123,7 @@ def process_packets(f, endian, connections):
 
         connection["last_flags"] = flags
         
-        connection["end_time"] = ts_sec + ts_usec/1_000_000
+        connection["end_time"] = relative_time
 
         tcp_header_len = ((packet_data[tcp_start + 12]>>4)& 0xF) * 4
 
