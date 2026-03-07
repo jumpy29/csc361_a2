@@ -1,4 +1,5 @@
 import struct
+import sys
 
 def read_global_header(f):
     global_header = f.read(24)
@@ -445,8 +446,8 @@ def print_tcp_complete_conns_details(
     print("Mean receiver window size (receiver side):", win_dst_mean)
 
 def main():
-
-    f = open("sample-capture-file.cap", "rb")
+    file = sys.argv[1]
+    f = open(file, "rb")
 
     endian = read_global_header(f)
 
